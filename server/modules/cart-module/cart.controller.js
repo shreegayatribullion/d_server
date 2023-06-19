@@ -113,10 +113,10 @@ exports.updateCart = async (req, res, next) => {
   const { body } = req;
   const { product_id, user_id, session_id } = body;
 
-  const statement = `UPDATE dog_cart_item SET quantity= quantity + 1, total = price * quantity
+  const statement = `UPDATE dog_cart_item SET quantity = quantity + 1, total = price * quantity
   WHERE session_id = ${session_id} AND product_id = ${product_id} AND user_id = ${user_id}`;
 
-  pool.query(statement, (err, result, fileds) => {
+  pool.query(statement, (err, result, fields) => {
     try {
       if (err) {
         res.status(500).json({
@@ -125,18 +125,72 @@ exports.updateCart = async (req, res, next) => {
           success: false,
         });
         return;
-      } else if (result) {
+      } else if (result.affectedRows > 0) {
+        const selectStatement = `SELECT * FROM dog_cart_item WHERE session_id = ${session_id} AND product_id = ${product_id} AND user_id = ${user_id}`;
+        pool.query(selectStatement, (selectErr, selectResult) => {
+          if (selectErr) {
+            res.status(500).json({
+              status: 500,
+              message: selectErr,
+              success: false,
+            });
+            return;
+          }
+          res.status(200).json({
+            status: 200,
+            message: "Cart updated successfully",
+            success: true,
+            data: selectResult,
+          });
+        });
+      } else {
         res.status(200).json({
           status: 200,
-          message: "cart updated successfuly",
-          success: true,
-          data: result[0],
+          message: "No rows were updated",
+          success: false,
+          data: [],
         });
       }
     } catch (error) {
       logger.error(`error/AuthController/login${error}`);
       res.status(500).json({
-        message: "Ops something went wrong",
+        message: "Oops, something went wrong",
+        status: 500,
+        success: false,
+      });
+    }
+  });
+};
+
+exports.getProductCount = async (req, res, next) => {
+  const { body } = req;
+  const { product_id, user_id, session_id } = body;
+
+  console.log("first", product_id, user_id, session_id);
+
+  const selectStatement = `SELECT * FROM dog_cart_item WHERE session_id = ${session_id} AND product_id = ${product_id} AND user_id = ${user_id}`;
+
+  pool.query(selectStatement, (err, result) => {
+    try {
+      if (err) {
+        res.status(500).json({
+          status: 500,
+          message: err,
+          success: false,
+        });
+        return;
+      }
+
+      res.status(200).json({
+        status: 200,
+        message: "Product count retrieved successfully",
+        success: true,
+        data: result,
+      });
+    } catch (error) {
+      logger.error(`error/AuthController/login${error}`);
+      res.status(500).json({
+        message: "Oops, something went wrong",
         status: 500,
         success: false,
       });
