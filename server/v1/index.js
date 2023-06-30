@@ -1,6 +1,10 @@
 const express = require("express");
-const authRoutes = require("../modules/auth-module/auth.routes");
-const cateogryRoutes = require("../modules/category-module/category.routes");
+const auth = require("../modules/auth");
+const address = require("../modules/address");
+const category = require("../modules/category");
+////
+const authMiddleware = require("../middlewares/auth.middleware");
+///
 const bannerRoutes = require("../modules/banner-module/banner.routes");
 const productRoutes = require("../modules/product-module/product.routes");
 const cartRoutes = require("../modules/cart-module/cart.routes");
@@ -11,8 +15,10 @@ const paymentRoutes = require("../modules/payment-module/payment.routes");
 
 const router = express.Router();
 
-router.use("/auth", authRoutes);
-router.use("/category", cateogryRoutes);
+router.use("/auth", auth);
+router.use("/address", authMiddleware.verifyToken, address);
+router.use("/category", authMiddleware.verifyToken, category);
+/////
 router.use("/banner", bannerRoutes);
 router.use("/product", productRoutes);
 router.use("/cart", cartRoutes);

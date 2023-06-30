@@ -1,7 +1,7 @@
-const pool = require("../../database");
-const logger = require("../common/logger");
+const pool = require("../../../../database");
+const logger = require("../../../common/logger");
 
-exports.duplicateCategory = async (req, res, next) => {
+exports.duplicate = async (req, res, next) => {
   try {
     let { body } = req;
     let { slug } = body;

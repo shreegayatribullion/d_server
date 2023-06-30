@@ -1,5 +1,7 @@
 const pool = require("../../../database");
 const logger = require("../../common/logger");
+const jwt = require("jsonwebtoken");
+const { secret } = require("../../constant/secret.constant");
 
 exports.singup = async (req, res, next) => {
   try {
@@ -20,8 +22,14 @@ exports.singup = async (req, res, next) => {
         return;
       }
       if (result) {
-        req.body.user_id = result.insertId;
-        next();
+        res.status(200).json({
+          status: 200,
+          message: "User created successfuly",
+          data: { user_id: result.insertId },
+          success: true,
+        });
+        // req.body.user_id = result.insertId;
+        // next();
       }
     });
   } catch (error) {
@@ -41,14 +49,17 @@ exports.login = async (req, res, next) => {
   let statement = `SELECT *, COUNT(*) AS cnt FROM dog_user WHERE mobno = ${mobno} AND password = '${password}'`;
 
   pool.query(statement, (err, result, fields) => {
-    logger.info(`result of login ${result}`);
     try {
       if (result[0].cnt > 0) {
+        var token = jwt.sign({ mobno: mobno, type: "user" }, secret, {
+          // expiresIn: 86400,
+          expiresIn: 3600,
+        });
         res.status(200).json({
           message: "Logged in!",
           status: 200,
           success: true,
-          data: result[0],
+          data: { ...result[0], token },
         });
       } else {
         res.status(422).json({
@@ -58,7 +69,6 @@ exports.login = async (req, res, next) => {
         });
       }
     } catch (error) {
-      logger.error(`error/AuthController/login${error}`);
       res.status(500).json({
         message: "Ops something went wrong",
         status: 500,

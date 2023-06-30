@@ -1,6 +1,5 @@
 const express = require("express");
 const catgoryController = require("./banner.controller");
-const categoryMiddleware = require("../../middlewares/category.middleware");
 const { postFile } = require("../utils/upload-service/mutler.service");
 
 const router = express.Router();

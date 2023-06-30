@@ -1,31 +1,20 @@
-const pool = require("../../database");
-const logger = require("../common/logger");
+const { secret } = require("../constant/secret.constant");
+const jwt = require("jsonwebtoken");
 
-exports.AuthMiddleware = async (req, res, next) => {
-  try {
-    let { body } = req;
-    let { name, mobno } = body;
-
-    const statement = `SELECT * FROM dog_user WHERE mobno = ${mobno}`;
-
-    const query = (statement) => {
-      pool.query(statement, (error, results, fields) => {
-        logger.info(`results of middleware ${results}`);
-        if (results?.length) {
-          res.status(422).json({
-            message: "User already exist with the name and mobile number",
-          });
-        } else {
-          next();
-        }
+exports.verifyToken = async (req, res, next) => {
+  // var token = req.headers.Authorization;
+  let token = req.headers.auth_token;
+  console.log("token", token);
+  jwt.verify(token, secret, function (err, decoded) {
+    console.log("decoded", decoded);
+    if (!err) {
+      req.user_detail = decoded;
+      next();
+    } else {
+      res.status(401).json({
+        message: err.message,
+        code: 401,
       });
-    };
-    query(statement);
-  } catch (error) {
-    logger.error(`error occured ${error}`);
-    res.status(500).json({
-      message: "Internal Server Error",
-      success: false,
-    });
-  }
+    }
+  });
 };
