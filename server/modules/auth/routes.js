@@ -8,4 +8,6 @@ router.post("/signup", authMiddleware.AuthMiddleware, authController.singup);
 
 router.post("/login", authController.login);
 
+router.post("/admin/login", authController.adminLogin);
+
 module.exports = router;

@@ -30,11 +30,18 @@ const upload = multer({
 exports.postFile = async (req, res, next) => {
   upload(req, res, function (err, data) {
     req.body.file_name = FILE_NAME;
+    console.log("req.body.file_name", req.body.file_name);
     const apiUrl =
       "https://arihantchemical.in/upload-service/upload_service.php";
-    console.log("req", req.file);
+    // console.log("req", req.file);
     const formData = new FormData();
-    formData.append("file", fs.createReadStream(`./file/${req.body.file_name}`));
+    if (req.file === undefined) {
+      return next();
+    }
+    formData.append(
+      "file",
+      fs.createReadStream(`./file/${req.body.file_name}`)
+    );
     axios
       .post(apiUrl, formData, {
         headers: formData.getHeaders(),

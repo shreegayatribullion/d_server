@@ -2,6 +2,7 @@ const express = require("express");
 const auth = require("../modules/auth");
 const address = require("../modules/address");
 const category = require("../modules/category");
+const staticBanner = require("../modules/static-banner");
 ////
 const authMiddleware = require("../middlewares/auth.middleware");
 ///
@@ -18,6 +19,7 @@ const router = express.Router();
 router.use("/auth", auth);
 router.use("/address", authMiddleware.verifyToken, address);
 router.use("/category", authMiddleware.verifyToken, category);
+router.use("/static-banner", staticBanner);
 /////
 router.use("/banner", bannerRoutes);
 router.use("/product", productRoutes);

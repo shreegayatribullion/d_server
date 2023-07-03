@@ -18,3 +18,17 @@ exports.verifyToken = async (req, res, next) => {
     }
   });
 };
+
+exports.addClientInfo = async (req, res, next) => {
+  let token = req.headers.auth_token;
+
+  jwt.verify(token, secret, function (err, decoded) {
+    if (!err) {
+      req.user_detail = decoded;
+      next();
+    } else {
+      req.user_detail = { type: "user" };
+      next();
+    }
+  });
+};
