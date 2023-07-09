@@ -4,6 +4,7 @@ const address = require("../modules/address");
 const category = require("../modules/category");
 const staticBanner = require("../modules/static-banner");
 const brands = require("../modules/brands");
+const petType = require("../modules/pet-type");
 ////
 const authMiddleware = require("../middlewares/auth.middleware");
 ///
@@ -19,9 +20,10 @@ const router = express.Router();
 
 router.use("/auth", auth);
 router.use("/address", authMiddleware.verifyToken, address);
-router.use("/category", authMiddleware.verifyToken, category);
 router.use("/static-banner", staticBanner);
 router.use("/brands", brands);
+router.use("/categories", category);
+router.use("/pet-type", petType);
 /////
 router.use("/banner", bannerRoutes);
 router.use("/product", productRoutes);

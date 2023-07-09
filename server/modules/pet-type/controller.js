@@ -1,6 +1,6 @@
 const pool = require("../../../database");
 
-const TABLE = "dog_brands";
+const TABLE = "dog_pet_type";
 
 exports.get = async (req, res, next) => {
   try {
