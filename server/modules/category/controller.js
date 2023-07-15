@@ -80,6 +80,95 @@ exports.get = async (req, res, next) => {
   }
 };
 
+exports.getPetwiseCategory = async (req, res, next) => {
+  try {
+    const { query } = req;
+    const { active } = query;
+    let statement = "";
+
+    if (active) {
+      statement = `SELECT dc.*, dpt.pet_type_id, pt.name AS pet_type_name,pt.image AS pet_type_image, dc.image AS category_image
+      FROM dog_category dc
+      LEFT JOIN dog_pet_type_x_categories dpt ON dc.id = dpt.category_id
+      LEFT JOIN dog_pet_type pt ON dpt.pet_type_id = pt.id
+      WHERE dc.archive = 0 AND dc.active = 1;`;
+    } else {
+      if (req.user_detail.type === "user") {
+        res.status(401).json({
+          status: 401,
+          message: "Not allowed!",
+          success: false,
+        });
+        return;
+      }
+      statement = `SELECT dc.*, dpt.pet_type_id, pt.name AS pet_type_name
+                  FROM dog_category dc
+                  LEFT JOIN dog_pet_type_x_categories dpt ON dc.id = dpt.category_id
+                  LEFT JOIN dog_pet_type pt ON dpt.pet_type_id = pt.id
+                  WHERE dc.archive = 0;`;
+    }
+
+    pool.query(statement, (err, result) => {
+      try {
+        if (err) {
+          res.status(500).json({
+            status: 500,
+            message: err,
+            success: false,
+          });
+          return;
+        }
+
+        const groupedData = {};
+
+        result.forEach((row) => {
+          const {
+            id,
+            name,
+            pet_type_id,
+            pet_type_name,
+            pet_type_image,
+            category_image,
+          } = row;
+          const pet_type = pet_type_id ? pet_type_name : "default";
+
+          if (!groupedData[pet_type]) {
+            groupedData[pet_type] = [];
+          }
+
+          groupedData[pet_type].push({ id, name, image: category_image });
+        });
+
+        const formattedData = Object.keys(groupedData).map((pet_type) => ({
+          pet_type,
+          data: groupedData[pet_type],
+        }));
+
+        res.status(200).json({
+          status: 200,
+          message: "Data fetched successfully",
+          success: true,
+          data: formattedData,
+        });
+      } catch (error) {
+        console.log("error", error);
+        res.status(500).json({
+          message: "Oops, something went wrong",
+          status: 500,
+          success: false,
+        });
+      }
+    });
+  } catch (error) {
+    console.log("error 2", error);
+    res.status(500).json({
+      message: "Oops, something went wrong",
+      status: 500,
+      success: false,
+    });
+  }
+};
+
 exports.add = async (req, res, next) => {
   const { body } = req;
   const { name, file_name, slug, pet_type_ids } = body;
