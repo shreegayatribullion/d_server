@@ -5,6 +5,8 @@ const category = require("../modules/category");
 const staticBanner = require("../modules/static-banner");
 const brands = require("../modules/brands");
 const petType = require("../modules/pet-type");
+const productVariant = require("../modules/product-variant");
+const productVariantOption = require("../modules/product-variant-option");
 ////
 const authMiddleware = require("../middlewares/auth.middleware");
 ///
@@ -24,6 +26,9 @@ router.use("/static-banner", staticBanner);
 router.use("/brands", brands);
 router.use("/categories", category);
 router.use("/pet-type", petType);
+router.use("/product-variant", productVariant);
+router.use("/product-variant-option", productVariantOption);
+
 /////
 router.use("/banner", bannerRoutes);
 router.use("/product", productRoutes);
