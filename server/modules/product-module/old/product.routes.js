@@ -1,7 +1,7 @@
 const express = require("express");
 const productController = require("./product.controller");
-const productMiddleware = require("../../middlewares/product.middleware");
-const { postFile } = require("../utils/upload-service/mutler.service");
+const productMiddleware = require("../../../middlewares/product.middleware");
+const { postFile } = require("../../utils/upload-service/mutler.service");
 
 const router = express.Router();
 
