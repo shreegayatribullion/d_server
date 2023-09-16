@@ -8,7 +8,13 @@ const router = express.Router();
 
 router.get("/", authMiddleware.addClientInfo, controller.get);
 
-router.get("/petwise-category", authMiddleware.addClientInfo, controller.getPetwiseCategory);
+router.get("/highlight", authMiddleware.addClientInfo, controller.getHighlight);
+
+router.get(
+  "/petwise-category",
+  authMiddleware.addClientInfo,
+  controller.getPetwiseCategory
+);
 
 router.post("/add", authMiddleware.verifyToken, postFile, controller.add);
 
@@ -18,6 +24,12 @@ router.put(
   "/updateActiveRecord",
   authMiddleware.verifyToken,
   controller.updateActiveRecord
+);
+
+router.put(
+  "/updateHighlightStatus",
+  authMiddleware.verifyToken,
+  controller.updateHighlightStatus
 );
 
 router.delete("/delete/:id", authMiddleware.verifyToken, controller.delete);

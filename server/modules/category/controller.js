@@ -19,7 +19,7 @@ exports.get = async (req, res, next) => {
         });
         return;
       }
-      statement = `SELECT dc.*, GROUP_CONCAT(dptxc.pet_type_id) AS pet_type_ids
+      statement = `SELECT dc.*, GROUP_CONCAT(dptxc.pet_type_id) AS pet_type_ids, dc.highlight
       FROM dog_category dc
       JOIN dog_pet_type_x_categories dptxc ON dc.id = dptxc.category_id
       WHERE dc.archive = 0
@@ -53,6 +53,7 @@ exports.get = async (req, res, next) => {
                 name: row.name,
                 slug: row.slug,
                 pet_type_ids: row.pet_type_ids.split(",").map(Number),
+                highlight: row.highlight,
               };
             });
             res.status(200).json({
@@ -80,6 +81,60 @@ exports.get = async (req, res, next) => {
   }
 };
 
+exports.getHighlight = async (req, res, next) => {
+  try {
+    const { query } = req;
+    const { active } = query;
+    let statement = "";
+    if (active) {
+      statement = `SELECT * FROM ${TABLE} 
+      WHERE archive = ${false} AND active =${true} AND highlight = ${true}`;
+    } else {
+      if (req.user_detail.type === "user") {
+        res.status(401).json({
+          status: 401,
+          message: "Not allowed!",
+          success: false,
+        });
+        return;
+      }
+      statement = `SELECT * FROM ${TABLE} WHERE archive = ${false}`;
+    }
+
+    pool.query(statement, (err, result, fileds) => {
+      try {
+        if (err) {
+          res.status(500).json({
+            status: 500,
+            message: err,
+            success: false,
+          });
+          return;
+        } else if (result) {
+          res.status(200).json({
+            status: 200,
+            message: "Data fetched successfuly",
+            success: true,
+            data: result,
+          });
+        }
+      } catch (error) {
+        res.status(500).json({
+          message: "Ops something went wrong",
+          status: 500,
+          success: false,
+        });
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Ops something went wrong",
+      status: 500,
+      success: false,
+    });
+  }
+};
+
 exports.getPetwiseCategory = async (req, res, next) => {
   try {
     const { query } = req;
@@ -91,7 +146,7 @@ exports.getPetwiseCategory = async (req, res, next) => {
       FROM dog_category dc
       LEFT JOIN dog_pet_type_x_categories dpt ON dc.id = dpt.category_id
       LEFT JOIN dog_pet_type pt ON dpt.pet_type_id = pt.id
-      WHERE dc.archive = 0 AND dc.active = 1;`;
+      WHERE dc.archive = 0 AND dc.active = 1 limit 8;`;
     } else {
       if (req.user_detail.type === "user") {
         res.status(401).json({
@@ -360,6 +415,27 @@ exports.updateActiveRecord = async (req, res, next) => {
 
   pool.query(updateStatement, (updateErr, updateResult, updateFields) => {
     if (updateErr) {
+      // Handle the error
+      return;
+    }
+    res.status(200).json({
+      status: 200,
+      message: "Record updated successfully",
+      success: true,
+      data: { id },
+    });
+  });
+};
+
+exports.updateHighlightStatus = async (req, res, next) => {
+  const { body } = req;
+  const { id, active } = body;
+
+  const updateStatement = `UPDATE ${TABLE} SET highlight = ${active} WHERE id = ${id}`;
+
+  pool.query(updateStatement, (updateErr, updateResult, updateFields) => {
+    if (updateErr) {
+      console.log("updateErr", updateErr);
       // Handle the error
       return;
     }

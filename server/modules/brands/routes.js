@@ -7,6 +7,8 @@ const router = express.Router();
 
 router.get("/", authMiddleware.addClientInfo, controller.get);
 
+router.get("/highlight", authMiddleware.addClientInfo, controller.getHighlight);
+
 router.post("/add", authMiddleware.verifyToken, postFile, controller.add);
 
 router.put("/update", authMiddleware.verifyToken, postFile, controller.update);
@@ -15,6 +17,12 @@ router.put(
   "/updateActiveRecord",
   authMiddleware.verifyToken,
   controller.updateActiveRecord
+);
+
+router.put(
+  "/updateHighlightStatus",
+  authMiddleware.verifyToken,
+  controller.updateHighlightStatus
 );
 
 router.delete("/delete/:id", authMiddleware.verifyToken, controller.delete);
