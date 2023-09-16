@@ -8,6 +8,20 @@ const router = express.Router();
 //
 router.get("/", authMiddleware.addClientInfo, controller.get);
 
+/**
+ *
+ */
+router.get(
+  "/byBrand/:id",
+  authMiddleware.addClientInfo,
+  controller.getProductsByBrands
+);
+
+/**
+ *
+ */
+router.get("/byCategory/:id", authMiddleware.addClientInfo, controller.get);
+
 //
 router.post(
   "/add",

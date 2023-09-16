@@ -55,6 +55,50 @@ exports.get = async (req, res, next) => {
   }
 };
 
+exports.getProductsByBrands = async (req, res, next) => {
+  const { params } = req;
+  const { id: brand_id } = params;
+
+  try {
+    let statement = `SELECT DTP.*, dog_brands.image as brand_image, dog_brands.id as brand_id, dog_brands.name as brand_name
+    FROM dog_temp_product AS DTP
+    INNER JOIN dog_brands ON dog_brands.id = DTP.brand_id
+    WHERE DTP.archive = false AND DTP.active = true AND DTP.brand_id = ${brand_id}`;
+
+    pool.query(statement, (err, result, fileds) => {
+      try {
+        if (err) {
+          res.status(500).json({
+            status: 500,
+            message: err,
+            success: false,
+          });
+          return;
+        } else if (result) {
+          res.status(200).json({
+            status: 200,
+            message: "Data fetched successfuly",
+            success: true,
+            data: result,
+          });
+        }
+      } catch (error) {
+        res.status(500).json({
+          message: "Ops something went wrong",
+          status: 500,
+          success: false,
+        });
+      }
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Ops something went wrong",
+      status: 500,
+      success: false,
+    });
+  }
+};
+
 exports.createProduct = async (req, res, next) => {
   const { body } = req;
 
