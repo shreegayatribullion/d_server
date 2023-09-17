@@ -20,7 +20,11 @@ router.get(
 /**
  *
  */
-router.get("/byCategory/:id", authMiddleware.addClientInfo, controller.get);
+router.get(
+  "/byCategory/:id",
+  authMiddleware.addClientInfo,
+  controller.getProductsByCategory
+);
 
 //
 router.post(
