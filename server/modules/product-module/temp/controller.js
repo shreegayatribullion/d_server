@@ -4,11 +4,17 @@ const TABLE = "dog_temp_product";
 
 exports.get = async (req, res, next) => {
   try {
-    const { query } = req;
+    const { query, params } = req;
+    const { id } = params;
     const { active } = query;
     let statement = "";
     if (active) {
-      statement = `SELECT * FROM ${TABLE} WHERE archive = ${false} AND active =${true}`;
+      console.log("id", id);
+      if (!id) {
+        statement = `SELECT * FROM ${TABLE} WHERE archive = ${false} AND active =${true}`;
+      } else {
+        statement = `SELECT * FROM ${TABLE} WHERE archive = ${false} AND id = ${id} AND active =${true}`;
+      }
     } else {
       if (req.user_detail.type === "user") {
         res.status(401).json({

@@ -6,7 +6,7 @@ const authMiddleware = require("../../../middlewares/auth.middleware");
 const router = express.Router();
 
 //
-router.get("/", authMiddleware.addClientInfo, controller.get);
+router.get("/:id", authMiddleware.addClientInfo, controller.get);
 
 /**
  *
